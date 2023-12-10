@@ -79,10 +79,13 @@ jobs:
 
       - name: Build image
         shell: bash
-        run: |
-          pwd && ls && \
-          sudo ./build.sh rockchip_rk3588_blade3_v101_defconfig && \
-          sudo ./build.sh all
+        run:
+          -|
+            cat << EOF | ./build.sh chip
+            20
+            2
+            EOF
+          - sudo ./build.sh all
     
       - name: Upload RK Image image
         uses: actions/upload-artifact@v3
