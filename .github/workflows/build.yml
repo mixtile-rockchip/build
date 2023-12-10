@@ -62,8 +62,7 @@ jobs:
         run: |
           sudo cp debian-rk3588.tar.gz /opt/ && sudo tar -xvf debian-rk3588.tar.gz -C /opt/ && \
           sudo apt-get update && sudo apt-get install -y xxd && \
-          sudo cp debian_prepare.sh /usr/bin/ && \
-          sudo debian_prepare.sh
+          sudo chmod a+x debian_prepare.sh && sudo ./debian_prepare.sh
 
       - name: Install repo
         shell: bash
