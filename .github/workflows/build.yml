@@ -89,7 +89,14 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: image-release-rockchip-format-mixtile-blade3-Debian
-          path: output/update/Image/update.img
+          path: ./output/update/Image/update.img
+          if-no-files-found: error
+
+      - name: Upload RAW Image image
+        uses: actions/upload-artifact@v3
+        with:
+          name: image-release-raw-format-mixtile-blade3-Debian
+          path: ./output/update/Image/update.raw.img
           if-no-files-found: error
 
       - name: Clean cache
