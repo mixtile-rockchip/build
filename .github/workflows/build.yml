@@ -79,6 +79,7 @@ jobs:
       - name: Build image
         shell: bash
         run: |
+          pwd && ls && \
           sudo ./build.sh rockchip_rk3588_blade3_v101_defconfig && \
           sudo ./build.sh all
     
