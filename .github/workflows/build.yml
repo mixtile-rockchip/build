@@ -50,7 +50,7 @@ jobs:
           libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl \
           llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev \
           liblzma-dev uuid-dev lzma-dev liblzma-dev libbluetooth-dev python-parted-doc \
-          u-boot-tools sudo time rsync libmpc-dev bsdmainutils python2
+          u-boot-tools sudo time rsync libmpc-dev bsdmainutils python2 xz-utils
 
       - name: Install ppa dependencies
         shell: bash
@@ -84,19 +84,27 @@ jobs:
           echo '2' >> input.txt && \
           sudo ./build.sh chip < input.txt && sudo rm input.txt && \
           sudo ./build.sh all
-    
+          sudo xz -3 --force --keep --quiet --threads=0 "${rawimg}"
+
+      - name: xz image
+        shell: bash
+        run: |
+          pushd ./output/update/Image && \
+          sudo xz -4 --force --quiet --threads=0 update.img && \
+          sudo xz -4 --force --quiet --threads=0 update.raw.img
+
       - name: Upload RK Image image
         uses: actions/upload-artifact@v3
         with:
           name: image-release-rockchip-format-mixtile-blade3-Debian
-          path: ./output/update/Image/update.img
+          path: ./output/update/Image/update.img.xz
           if-no-files-found: error
 
       - name: Upload RAW Image image
         uses: actions/upload-artifact@v3
         with:
           name: image-release-raw-format-mixtile-blade3-Debian
-          path: ./output/update/Image/update.raw.img
+          path: ./output/update/Image/update.raw.img.xz
           if-no-files-found: error
 
       - name: Clean cache
