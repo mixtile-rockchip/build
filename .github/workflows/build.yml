@@ -55,15 +55,15 @@ jobs:
       - name: Install ppa dependencies
         shell: bash
         run: |
-          add-apt-repository ppa:jacob/virtualisation && apt-get update && apt-get install -y binfmt-support qemu-user-static live-build
+          sudo add-apt-repository ppa:jacob/virtualisation && apt-get update && apt-get install -y binfmt-support qemu-user-static live-build
 
       - name: Install debian_prepare
         shell: bash
         run: |
           sudo cp debian-rk3588.tar.gz /opt/
-          cd /opt && tar -xvf debian-rk3588.tar.gz
-          apt-get update && apt-get install -y xxd
-          debian_prepare.sh /usr/bin/
+          sudo cd /opt && sudo tar -xvf debian-rk3588.tar.gz
+          sudo apt-get update && sudo apt-get install -y xxd
+          sudo cp debian_prepare.sh /usr/bin/
           sudo debian_prepare.sh
 
       - name: Install repo
