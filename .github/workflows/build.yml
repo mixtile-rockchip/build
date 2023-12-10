@@ -79,13 +79,11 @@ jobs:
 
       - name: Build image
         shell: bash
-        run:
-          -|
-            cat << EOF | ./build.sh chip
-            20
-            2
-            EOF
-          - sudo ./build.sh all
+        run: |
+          echo '20' > input.txt && \
+          echo '2' >> input.txt && \
+          sudo ./build.sh chip < input.txt && sudo rm input.txt && \
+          sudo ./build.sh all
     
       - name: Upload RK Image image
         uses: actions/upload-artifact@v3
