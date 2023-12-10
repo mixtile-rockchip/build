@@ -60,19 +60,18 @@ jobs:
       - name: Install debian_prepare
         shell: bash
         run: |
-          sudo cp debian-rk3588.tar.gz /opt/
-          sudo cd /opt && sudo tar -xvf debian-rk3588.tar.gz
-          sudo apt-get update && sudo apt-get install -y xxd
-          sudo cp debian_prepare.sh /usr/bin/
+          sudo cp debian-rk3588.tar.gz /opt/ && cd /opt && sudo tar -xvf debian-rk3588.tar.gz && \
+          sudo apt-get update && sudo apt-get install -y xxd && \
+          sudo cp debian_prepare.sh /usr/bin/ && \
           sudo debian_prepare.sh
 
       - name: Install repo
         shell: bash
         run: |
-          mkdir -p ~/.bin
-          sudo PATH="${HOME}/.bin:${PATH}"
-          sudo curl https://storage.googleapis.com/git-repo-downloads/repo > ~/.bin/repo
-          sudo chmod a+rx ~/.bin/repo
+          mkdir -p ~/.bin && \
+          sudo PATH="${HOME}/.bin:${PATH}" && \
+          sudo curl https://storage.googleapis.com/git-repo-downloads/repo > ~/.bin/repo && \
+          sudo chmod a+rx ~/.bin/repo && \
 
       - name: download code
         shell: bash
