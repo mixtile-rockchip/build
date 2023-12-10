@@ -67,7 +67,7 @@ jobs:
       - name: Install repo
         shell: bash
         run: |
-          mkdir -p ~/.bin && sudo PATH="${HOME}/.bin:${PATH}" && \
+          mkdir -p ~/.bin && PATH="${HOME}/.bin:${PATH}" && \
           sudo curl https://storage.googleapis.com/git-repo-downloads/repo -o ~/.bin/repo && \
           sudo chmod a+rx ~/.bin/repo
 
