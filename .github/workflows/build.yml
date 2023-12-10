@@ -70,7 +70,7 @@ jobs:
           mkdir -p ~/.bin && \
           sudo PATH="${HOME}/.bin:${PATH}" && \
           sudo curl https://storage.googleapis.com/git-repo-downloads/repo > ~/.bin/repo && \
-          sudo chmod a+rx ~/.bin/repo && \
+          sudo chmod a+rx ~/.bin/repo
 
       - name: download code
         shell: bash
