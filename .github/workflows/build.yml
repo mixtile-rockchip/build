@@ -84,14 +84,14 @@ jobs:
           echo '2' >> input.txt && \
           sudo ./build.sh chip < input.txt && sudo rm input.txt && \
           sudo ./build.sh all
-          sudo xz -3 --force --keep --quiet --threads=0 "${rawimg}"
 
       - name: xz image
         shell: bash
         run: |
           pushd ./output/update/Image && \
           sudo xz -4 --force --quiet --threads=0 update.img && \
-          sudo xz -4 --force --quiet --threads=0 update.raw.img
+          sudo xz -4 --force --quiet --threads=0 update.raw.img && \
+          popd
 
       - name: Upload RK Image image
         uses: actions/upload-artifact@v3
