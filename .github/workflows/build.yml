@@ -74,7 +74,7 @@ jobs:
       - name: download code
         shell: bash
         run: |
-          repo init -u https://github.com/mixtile-rockchip/manifests.git -b test -m rk3588_linux_release.xml && \
+          repo init -u https://github.com/mixtile-rockchip/manifests.git -b master -m rk3588_linux_release.xml && \
           repo sync
 
       - name: Build image
