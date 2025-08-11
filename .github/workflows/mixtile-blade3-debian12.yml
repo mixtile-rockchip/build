@@ -1,0 +1,125 @@
+name: Build
+run-name: Build with Mixtile blade3 Debian
+
+on:
+  workflow_dispatch:
+    inputs:
+      launchpad:
+        description: use launchpad
+        required: true
+        default: false
+        type: boolean
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    strategy:
+      matrix:
+        platform:
+          - mixtile-blade3
+
+    steps:
+      - name: Get more disk space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 2048
+          swap-size-mb: 1024
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+          remove-docker-images: 'true'
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Checkout LFS
+        shell: bash
+        run: git lfs fetch && git lfs checkout
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          sudo apt-get update && sudo apt-get upgrade -y
+          sudo apt-get install -y git ssh make gcc libssl-dev \
+          liblz4-tool expect g++ patchelf chrpath gawk texinfo \
+          chrpath diffstat software-properties-common bison flex \
+          fakeroot cmake gcc-multilib g++-multilib unzip device-tree-compiler \
+          libncurses-dev python3-pip python3-pyelftools bc make build-essential \
+          libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl \
+          llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev \
+          liblzma-dev uuid-dev lzma-dev liblzma-dev libbluetooth-dev python-parted-doc \
+          u-boot-tools sudo time rsync libmpc-dev bsdmainutils python2 xz-utils gettext
+
+      - name: Install ppa dependencies
+        shell: bash
+        run: |
+          sudo apt-get update && sudo apt-get install -y binfmt-support qemu-user-static live-build
+
+      - name: Install debian_prepare
+        shell: bash
+        run: |
+          sudo cp debian-rk3588.tar.gz /opt/ && sudo tar -xvf debian-rk3588.tar.gz -C /opt/ && \
+          sudo apt-get update && sudo apt-get install -y xxd && \
+          sudo chmod a+x debian_prepare.sh && sudo ./debian_prepare.sh && \
+          sudo update-binfmts --enable qemu-aarch64
+
+      - name : Rebuild live-build
+        shell: bash
+        run: |
+          sudo apt-get remove live-build
+          pushd /tmp && \
+          git clone https://salsa.debian.org/live-team/live-build.git --depth 1 -b debian/1%20230131 && \
+          cd live-build && \
+          rm -rf manpages/po/ && \
+          sudo make install && \
+          popd
+
+
+      - name: Install repo
+        shell: bash
+        run: |
+          mkdir -p ~/.bin && \
+          sudo curl https://storage.googleapis.com/git-repo-downloads/repo -o ~/.bin/repo && \
+          sudo cp ~/.bin/repo /usr/bin/repo && sudo chmod a+x /usr/bin/repo
+
+      - name: download code
+        shell: bash
+        run: |
+          repo init -u https://github.com/mixtile-rockchip/manifests.git -b rk3588-linux-6.1-rkr6 -m rk3588_linux6.1_release.xml && \
+          repo sync
+
+      - name: Build image
+        shell: bash
+        run: |
+          echo '2' > input.txt && \
+          echo '2' >> input.txt && \
+          sudo ./build.sh chip < input.txt && sudo rm input.txt && \
+          sudo ./build.sh all
+
+      - name: xz image
+        shell: bash
+        run: |
+          pushd ./output/update/Image && \
+          sudo xz -4 --force --quiet --threads=0 update.img && \
+          sudo xz -4 --force --quiet --threads=0 update.raw.img && \
+          popd
+
+      - name: Upload RK Image image
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-release-rockchip-format-mixtile-blade3-Debian12
+          path: ./output/update/Image/update.img.xz
+          if-no-files-found: error
+
+      - name: Upload RAW Image image
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-release-raw-format-mixtile-blade3-Debian12
+          path: ./output/update/Image/update.raw.img.xz
+          if-no-files-found: error
+
+      - name: Clean cache
+        shell: bash
+        run: sync && sudo rm -rf output && sync
